@@ -43,12 +43,12 @@ class Graph:
       if starting_vertex not in self.vertices:
         raise KeyError("Starting vertex not found")
 
-      queue = Queue()
+      queue = Queue() # LIFO
       visited = set()
 
       queue.enqueue(starting_vertex)
 
-      while queue.size() != 0:
+      while queue.size() > 0:
         vertex = queue.dequeue()
         if vertex not in visited:
           visited.add(vertex)
@@ -61,12 +61,12 @@ class Graph:
       if starting_vertex not in self.vertices:
         raise KeyError("Starting vertex not found")
         
-      stack = Stack()
+      stack = Stack() # FIFO
       visted = set()
       
       stack.push(starting_vertex)
 
-      while stack.size() != 0:
+      while stack.size() > 0:
         vertex = stack.pop()
         if vertex not in visted:
           visted.add(vertex)
@@ -101,27 +101,75 @@ class Graph:
       print(f"bfs: start={starting_vertex}, dest={destination_vertex}")
 
       queue = Queue()
-      visited_table = {}
-      prev_vert = None
+      visited = set()
 
-      queue.enqueue(starting_vertex)
+      queue.enqueue([starting_vertex])  # queue of paths (lists), copy
+      
+      """
+      {1: {2, 7}, 2: {1, 3, 4}, 3: {2, 5, 6}, 4: {2, 6, 7}, 5: {3}, 6: {3, 4, 7}, 7: {1, 4, 6}}
+      START = 1
+      END = 6
+      QUEUE [START]
+      QUEUE = (1)
 
-      while queue.size() != 0:
-        prev_vert = vertex
-        vertex = queue.dequeue()
+      --WHILE QUEUE NOT EMPTY--
+      
+      DEQUEUE INTO PATH
+      PATH = [1]
+      QUEUE = ()
+      1 = PATH[-1]
+      V = 1
+      1 NOT IN VISITED
+        VISITED = [1]
+        V == END ?
+          NO
+        QUEUE [PATH, 2]
+        QUEUE [PATH, 7]
+        QUEUE = ([1, 2], [1, 7])
+      
+      DEQUEUE INTO PATH
+      PATH = [1, 7]
+      QUEUE = ([1, 2])
+      7 = PATH[-1]
+      V = 7
+      7 NOT IN VISITED
+        VISITED = [1, 7]
+        V == END ?
+          NO
+        QUEUE [PATH, 1]
+        QUEUE [PATH, 4]
+        QUEUE [PATH, 6]
+        QUEUE = ([1, 7, 1], [1, 7, 4], [1, 7, 6])
+      
+      DEQUEUE INTO PATH
+      PATH = [1, 7, 6]
+      QUEUE = ([1, 7, 1], [1, 7, 4])
+      6 = PATH[-1]
+      V = 6
+      6 NOT IN VISITED
+        VISTED = [1, 7, 6]
+        V == END ?
+          YES
+          RETURN PATH
+      """
+      
+      while queue.size() > 0:
+        vertex_path = queue.dequeue()
+        vertex = vertex_path[-1] # last item because of LIFO
 
-        if prev_vert not in visited_table:
-          visited_table[prev_vert] = []
-        
-        if vertex not in visited_table[prev_vert]:
-          visited_table[prev_vert].append(vertex)
+        if vertex not in visited:
+          visited.add(vertex)
 
           if vertex == destination_vertex:
-            break
-          for v in self.vertices[vertex]:
-            queue.enqueue(v)
+            return vertex_path
 
-      return visited
+          for v in self.vertices[vertex]:
+            # add v to a copy of path and queue it
+            vertex_path_copy = list(vertex_path)
+            vertex_path_copy.append(v)
+            queue.enqueue(vertex_path_copy)
+
+      return None
 
     def dfs(self, starting_vertex, destination_vertex):
         """
