@@ -24,11 +24,11 @@ class Graph:
         """
         if v1 not in self.vertices:
           raise KeyError(f"Vertex not found: {v1}")
-        elif v2 not in self.vertices:
+
+        if v2 not in self.vertices:
           raise KeyError(f"Vertex not found: {v2}")
 
         self.vertices[v1].add(v2)
-        self.vertices[v2].add(v1)
 
     def get_neighbors(self, vertex_id):
         """
@@ -37,7 +37,7 @@ class Graph:
         if vertex_id not in self.vertices:
           raise KeyError("Vertex not found")
 
-        return self.vertices
+        return self.vertices[vertex_id]
 
     def bft(self, starting_vertex):
       if starting_vertex not in self.vertices:
@@ -52,28 +52,26 @@ class Graph:
         vertex = queue.dequeue()
         if vertex not in visited:
           visited.add(vertex)
-          for v in self.vertices[vertex]:
+          print(vertex)
+          for v in self.get_neighbors(vertex):
             queue.enqueue(v)
-
-      print(visited)
 
     def dft(self, starting_vertex):
       if starting_vertex not in self.vertices:
         raise KeyError("Starting vertex not found")
         
       stack = Stack() # FIFO
-      visted = set()
-      
       stack.push(starting_vertex)
+      
+      visited = set()
 
       while stack.size() > 0:
         vertex = stack.pop()
-        if vertex not in visted:
-          visted.add(vertex)
-          for v in self.vertices[vertex]:
+        if vertex not in visited:
+          print(vertex)
+          visited.add(vertex)
+          for v in self.get_neighbors(vertex):
             stack.push(v)
-
-      print(visted)
 
     def dft_recursive(self, starting_vertex):
       if starting_vertex not in self.vertices:
@@ -177,7 +175,33 @@ class Graph:
         starting_vertex to destination_vertex in
         depth-first order.
         """
-        pass  # TODO
+        if starting_vertex not in self.vertices:
+          raise KeyError("Starting vertex not found")
+        if destination_vertex not in self.vertices:
+          raise KeyError("Destination vertex not found")
+
+        # print(f"dfs: start={starting_vertex}, dest={destination_vertex}")
+          
+        stack = Stack() # FIFO
+        visted = set()
+        
+        stack.push([starting_vertex])
+
+        while stack.size() > 0:
+          vertex_path = stack.pop()
+          vertex = vertex_path[0] # first item because of FIFO
+          if vertex not in visted:
+            visted.add(vertex)
+
+            if vertex == destination_vertex:
+              vertex_path.reverse()
+              return vertex_path
+
+            for v in self.vertices[vertex]:
+              vertex_path_copy = [v] + list(vertex_path)
+              stack.push(vertex_path_copy)
+
+        return None
 
     def dfs_recursive(self, starting_vertex, destination_vertex):
         """
