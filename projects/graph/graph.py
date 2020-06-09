@@ -13,50 +13,115 @@ class Graph:
         """
         Add a vertex to the graph.
         """
-        pass  # TODO
+        if vertex_id not in self.vertices:
+          self.vertices[vertex_id] = set()
+        else:
+          raise KeyError("Vertex already exists")
 
     def add_edge(self, v1, v2):
         """
         Add a directed edge to the graph.
         """
-        pass  # TODO
+        if v1 not in self.vertices:
+          raise KeyError(f"Vertex not found: {v1}")
+        elif v2 not in self.vertices:
+          raise KeyError(f"Vertex not found: {v2}")
+
+        self.vertices[v1].add(v2)
+        self.vertices[v2].add(v1)
 
     def get_neighbors(self, vertex_id):
         """
         Get all neighbors (edges) of a vertex.
         """
-        pass  # TODO
+        if vertex_id not in self.vertices:
+          raise KeyError("Vertex not found")
+
+        return self.vertices
 
     def bft(self, starting_vertex):
-        """
-        Print each vertex in breadth-first order
-        beginning from starting_vertex.
-        """
-        pass  # TODO
+      if starting_vertex not in self.vertices:
+        raise KeyError("Starting vertex not found")
+
+      queue = Queue()
+      visited = set()
+
+      queue.enqueue(starting_vertex)
+
+      while queue.size() != 0:
+        vertex = queue.dequeue()
+        if vertex not in visited:
+          visited.add(vertex)
+          for v in self.vertices[vertex]:
+            queue.enqueue(v)
+
+      print(visited)
 
     def dft(self, starting_vertex):
-        """
-        Print each vertex in depth-first order
-        beginning from starting_vertex.
-        """
-        pass  # TODO
+      if starting_vertex not in self.vertices:
+        raise KeyError("Starting vertex not found")
+        
+      stack = Stack()
+      visted = set()
+      
+      stack.push(starting_vertex)
+
+      while stack.size() != 0:
+        vertex = stack.pop()
+        if vertex not in visted:
+          visted.add(vertex)
+          for v in self.vertices[vertex]:
+            stack.push(v)
+
+      print(visted)
 
     def dft_recursive(self, starting_vertex):
-        """
-        Print each vertex in depth-first order
-        beginning from starting_vertex.
+      if starting_vertex not in self.vertices:
+        raise KeyError("Starting vertex not found")
+      
+      visited = set()
+      
+      def visit(vertex):
+        if vertex in visited:
+          return
+        visited.add(vertex)
+        for v in self.vertices[vertex]:
+          visit(v)
+      
+      visit(starting_vertex)
 
-        This should be done using recursion.
-        """
-        pass  # TODO
+      print(visited)
 
     def bfs(self, starting_vertex, destination_vertex):
-        """
-        Return a list containing the shortest path from
-        starting_vertex to destination_vertex in
-        breath-first order.
-        """
-        pass  # TODO
+      if starting_vertex not in self.vertices:
+        raise KeyError("Starting vertex not found")
+      if destination_vertex not in self.vertices:
+        raise KeyError("Destination vertex not found")
+
+      print(f"bfs: start={starting_vertex}, dest={destination_vertex}")
+
+      queue = Queue()
+      visited_table = {}
+      prev_vert = None
+
+      queue.enqueue(starting_vertex)
+
+      while queue.size() != 0:
+        prev_vert = vertex
+        vertex = queue.dequeue()
+
+        if prev_vert not in visited_table:
+          visited_table[prev_vert] = []
+        
+        if vertex not in visited_table[prev_vert]:
+          visited_table[prev_vert].append(vertex)
+
+          if vertex == destination_vertex:
+            break
+          for v in self.vertices[vertex]:
+            queue.enqueue(v)
+
+      return visited
 
     def dfs(self, starting_vertex, destination_vertex):
         """
