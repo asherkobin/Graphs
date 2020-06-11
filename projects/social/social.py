@@ -86,7 +86,7 @@ class SocialGraph:
     """
 
     #
-    # Do a BFS search SRC: Person DST: User
+    # Do a BFS search for every Person -- SRC: Person, DST: User
     #
     # BFS will give shortest path
     #
@@ -98,6 +98,7 @@ class SocialGraph:
       visited[person_id] = []
       queue = []
       queue.append([person_id])
+      results_len = len(results)
       
       while len(queue) > 0:
         path = queue.pop(0)
@@ -108,20 +109,25 @@ class SocialGraph:
 
           if sub_person_id == user_id:
             path.reverse()
-            results[person_id] = path
-            break
+            results[person_id] = path # connection found
+            break # go to next person
 
           for friend_id in self.friendships[sub_person_id]:
             path_copy = path.copy()
             path_copy.append(friend_id)
             queue.append(path_copy)
+      
+      if len(results) == results_len: # if nothing was added then no match was found
+        print("Sorry No Connection: " + str(person_id))
 
     return results
 
 
 if __name__ == '__main__':
+    print("Populating Graph...")
     sg = SocialGraph()
     sg.populate_graph(10, 2)
     print(sg.friendships)
+    print("Searching Graph...")
     connections = sg.get_all_social_paths(1)
     print(connections)
