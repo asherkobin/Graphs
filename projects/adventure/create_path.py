@@ -1,9 +1,9 @@
 from ast import literal_eval
 
-map_file = "projects/adventure/maps/test_line.txt"
+#map_file = "projects/adventure/maps/test_line.txt"
 # map_file = "projects/adventure/maps/test_loop_simple.txt"
 # map_file = "projects/adventure/maps/test_cross.txt"
-# map_file = "projects/adventure/maps/test_loop.txt"
+map_file = "projects/adventure/maps/test_loop.txt"
 # map_file = "projects/adventure/maps/test_loop_fork.txt"
 # map_file = "projects/adventure/maps/main_maze.txt"
 
@@ -139,19 +139,19 @@ def create_path(room_graph):
   ordinal_map = build_ordinal_map(room_graph)
   num_rooms = len(g)
   visited_rooms = {}
-  final_path = []
-  
-  # gotta start somewhere
-
   start_room_id = 0
-  next_room_id = g.get_neighbors(start_room_id).pop()
+  final_path = [start_room_id]
+  
+  for next_room_id in g.get_neighbors(start_room_id):
 
-  while len(visited_rooms) < num_rooms:
     path_to_branch = get_path_to_branch(g, start_room_id, next_room_id)
 
-    if str(type(path_to_branch[-1])) == "<class 'str'>":
-      path_to_branch = path_to_branch[:-1]
-    move_list = convert_path_to_moves(path_to_branch, ordinal_map)
+    # TEMP TEST
+    # if str(type(path_to_branch[-1])) == "<class 'str'>":
+    #   move_list = convert_path_to_moves(path_to_branch[:-1], ordinal_map)
+    # else:
+    #   move_list = convert_path_to_moves(path_to_branch, ordinal_map)
+    # END TEMP TEST
 
     if len(path_to_branch) == 0:
       raise Exception("Impossible")
@@ -162,14 +162,17 @@ def create_path(room_graph):
       # else pick a path to explore
       pass
     elif path_to_branch[-1] is "LOOP":
-      pass
+      path_to_branch.remove("LOOP")
+      final_path.extend(path_to_branch)
+      final_path.append(start_room_id)
+      continue
+      
     elif path_to_branch[-1] is "END":
       path_to_branch.remove("END")
-      
-      # backtrack until found room with unvisited connection (BFS)
-      # pick a path to explore
-      # continue
-      pass
+      final_path.extend(path_to_branch)
+      path_to_branch.reverse()
+      final_path.extend(path_to_branch[1:] + [start_room_id])
+      continue
 
     else:
       pass # make decision
@@ -187,4 +190,4 @@ def create_path(room_graph):
 
 """
 
-create_path(room_graph)
+#create_path(room_graph)
