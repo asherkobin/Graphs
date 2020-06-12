@@ -1,7 +1,7 @@
 from ast import literal_eval
 
-# map_file = "projects/adventure/maps/test_line.txt"
-map_file = "projects/adventure/maps/test_loop_simple.txt"
+map_file = "projects/adventure/maps/test_line.txt"
+# map_file = "projects/adventure/maps/test_loop_simple.txt"
 # map_file = "projects/adventure/maps/test_cross.txt"
 # map_file = "projects/adventure/maps/test_loop.txt"
 # map_file = "projects/adventure/maps/test_loop_fork.txt"
@@ -57,20 +57,39 @@ def build_graph(room_graph):
 
   return g
 
-#
-# DFT w/Pathing - returns when a branch is found
-#
-# start_room is cleared to continue to next_room
-#
+def build_ordinal_map(room_graph):
+  """
+  FROM
+  1: [(3, 6), {'s': 0, 'n': 2}]
+  2: [(3, 7), {'s': 1, 'n': 3}]
+  TO
+  (1, 0): "s"
+  (1, 2): "n"
+  (2, 1): "s"
+  (2, 3): "n"
+  """
 
-"""
+  ordinal_map = {}
 
-0: [(3, 5), {'n': 1}]
-1: [(3, 6), {'s': 0, 'n': 2}]
-2: [(3, 7), {'s': 1, 'n': 3}]
-3: [(3, 8), {'s': 2}]
+  for room_id in room_graph:
+    moves = room_graph[room_id][1]
+    for move in moves:
+      connected_room_id = moves[move]
+      ordinal_map[(room_id, connected_room_id)] = move
 
-"""
+  return ordinal_map
+
+def convert_path_to_moves(path, ordinal_map):
+  moves = []
+  path_len = len(path)
+  
+  for idx, room_id in enumerate(path):
+    if idx == path_len - 1: # do not look beyond next element
+      break
+    next_room_id = path[idx + 1]
+    moves.append(ordinal_map[(room_id, next_room_id)])
+
+  return moves
 
 def get_path_to_branch(g, start_room, next_room): 
   path = []
@@ -117,17 +136,22 @@ def get_path_to_branch(g, start_room, next_room):
 
 def create_path(room_graph):
   g = build_graph(room_graph)
+  ordinal_map = build_ordinal_map(room_graph)
   num_rooms = len(g)
   visited_rooms = {}
+  final_path = []
   
   # gotta start somewhere
 
   start_room_id = 0
   next_room_id = g.get_neighbors(start_room_id).pop()
 
-
   while len(visited_rooms) < num_rooms:
     path_to_branch = get_path_to_branch(g, start_room_id, next_room_id)
+
+    if str(type(path_to_branch[-1])) == "<class 'str'>":
+      path_to_branch = path_to_branch[:-1]
+    move_list = convert_path_to_moves(path_to_branch, ordinal_map)
 
     if len(path_to_branch) == 0:
       raise Exception("Impossible")
@@ -140,6 +164,8 @@ def create_path(room_graph):
     elif path_to_branch[-1] is "LOOP":
       pass
     elif path_to_branch[-1] is "END":
+      path_to_branch.remove("END")
+      
       # backtrack until found room with unvisited connection (BFS)
       # pick a path to explore
       # continue
@@ -147,7 +173,18 @@ def create_path(room_graph):
 
     else:
       pass # make decision
+
+  move_list = convert_path_to_moves(final_path, ordinal_map)
   
-  return ["n", "n"]
+  return move_list
+
+"""
+
+0: [(3, 5), {'n': 1}]
+1: [(3, 6), {'s': 0, 'n': 2}]
+2: [(3, 7), {'s': 1, 'n': 3}]
+3: [(3, 8), {'s': 2}]
+
+"""
 
 create_path(room_graph)
