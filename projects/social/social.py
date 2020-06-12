@@ -30,6 +30,29 @@ class SocialGraph:
     self.users[self.last_id] = User(name)
     self.friendships[self.last_id] = set()
 
+  def populate_graph_lecture(self, num_users, avg_friendships):
+    self.last_id = 0
+    self.users = {}
+    self.friendships = {}
+
+    # Add users
+    for i in range(0, num_users):
+      self.add_user(f"User {i}")
+
+    target_friendships = (num_users * avg_friendships) // 2
+    total_friendships = 0
+    collisions = 0
+
+    while total_friendships < target_friendships:
+      user_id = random.randint(1, self.last_id)
+      friend_id = random.randint(1, self.last_id)
+
+      if self.add_friendship(user_id, friend_id):
+        total_friendships += 1
+      else:
+        collisions += 1
+      
+
   def populate_graph(self, num_users, avg_friendships):
     """
     Takes a number of users and an average number of friendships
@@ -68,6 +91,26 @@ class SocialGraph:
       friendship = possible_friendships[i]
       self.add_friendship(friendship[0], friendship[1])
 
+  def get_all_social_paths_lecture(self, user_id):
+    visited = {}
+    q = []
+
+    q.append([user_id])
+
+    while len(q) > 0:
+      path = q.pop(0)
+
+      v = path[-1]
+
+      if v not in visited:
+        visited[v] = path
+
+        for n in self.friendships[v]:
+          q.append([*path, n])
+
+    return visited
+
+  
   def get_all_social_paths(self, user_id):
     """
     Takes a user's user_id as an argument
@@ -126,8 +169,13 @@ class SocialGraph:
 if __name__ == '__main__':
     print("Populating Graph...")
     sg = SocialGraph()
-    sg.populate_graph(10, 2)
+    sg.populate_graph(15, 5)
     print(sg.friendships)
     print("Searching Graph...")
-    connections = sg.get_all_social_paths(1)
+    connections = sg.get_all_social_paths_lecture(5)
     print(connections)
+
+    users_in_ext_network = len(connections) - 1
+    total_users = len(sg.users)
+
+    print(f"Perc: {users_in_ext_network / total_users * 100:.2f} ")
