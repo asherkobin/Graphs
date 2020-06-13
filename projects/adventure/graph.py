@@ -28,18 +28,17 @@ class Graph:
     if vertex_id not in self.vertices:
       raise KeyError("Vertex not found")
 
-    item_count = 0
-
-    for v in self.vertices:
-      for _ in self.vertices[v]:
-        item_count += 1
-
-    if item_count != self.frozen_count:
-      raise ValueError("Graph as been COMPRIMISED")
+    if self.frozen_count > 0: # corruption detection on
+      item_count = 0
+      for v in self.vertices:
+        for _ in self.vertices[v]:
+          item_count += 1
+      if item_count != self.frozen_count:
+        raise ValueError("Graph as been COMPRIMISED")
 
     return self.vertices[vertex_id].copy() # SUPER IMPORTANT
 
-  def freeze(self):
+  def freeze(self): # enables corruption detection
     self.frozen_count = 0
 
     for v in self.vertices:

@@ -2,7 +2,7 @@ from room import Room
 from player import Player
 from world import World
 
-from get_path import get_path
+from explore_graph import explore_graph
 
 import random
 from ast import literal_eval
@@ -35,7 +35,7 @@ player = Player(world.starting_room)
 
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
-traversal_path = get_path(room_graph)
+traversal_path = explore_graph(room_graph)
 
 
 
