@@ -1,7 +1,8 @@
 from room import Room
 from player import Player
 from world import World
-from create_path import create_path
+
+from get_path import get_path
 
 import random
 from ast import literal_eval
@@ -13,12 +14,10 @@ world = World()
 # You may uncomment the smaller graphs for development and testing purposes.
 #map_file = "projects/adventure/maps/test_line.txt"
 #map_file = "projects/adventure/maps/test_loop_simple.txt"
-map_file = "projects/adventure/maps/test_cross.txt"
-
+#map_file = "projects/adventure/maps/test_cross.txt"
 #map_file = "projects/adventure/maps/test_cross_double.txt"
-
 #map_file = "projects/adventure/maps/test_loop.txt"
-#map_file = "projects/adventure/maps/test_loop_fork.txt"
+map_file = "projects/adventure/maps/test_loop_fork.txt"
 # map_file = "projects/adventure/maps/main_maze.txt"
 
 # Loads the map into a dictionary
@@ -34,7 +33,7 @@ player = Player(world.starting_room)
 
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
-traversal_path = create_path(room_graph)
+traversal_path = get_path(room_graph)
 
 
 
