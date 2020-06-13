@@ -17,11 +17,10 @@ def explore_graph(room_direction_graph):
   room_graph.freeze() # help detect corruption
   
   stack.append([start_room_id])
-  rooms_with_unexpored_paths.append(start_room_id)
 
   # at the worse, keep going until there are every path has been explored
-  
-  while len(rooms_with_unexpored_paths) > 0:
+  t = [4, 8]
+  while len(rooms_with_unexpored_paths) > 0 or room_id == start_room_id:
     path = stack.pop()
     room_id = path[0]
 
@@ -29,16 +28,26 @@ def explore_graph(room_direction_graph):
     num_unexplored_rooms = len(unexplored_adjacent_rooms_set)
 
     if num_unexplored_rooms == 0: # aka DEAD-END
-      rooms_with_unexpored_paths.remove(room_id) # remove from list (if there)
+      if room_id in rooms_with_unexpored_paths:
+        raise Exception("Unexpected")
       previous_room_with_unexpored_paths = rooms_with_unexpored_paths[-1]
       backtrack_path = backtrack(room_id, previous_room_with_unexpored_paths, room_graph)
-      # ?? mother_path.extend(backtrack_path)
-      room_id = previous_room_with_unexpored_paths
+      backtrack_path.reverse()
+      path = backtrack_path[:-1] + path
+      stack.append(path)
+      stack.append([previous_room_with_unexpored_paths])
     else:
       # pick a random unexplored adjacent room to visit
-      next_room_id = random.randint(0, num_unexplored_rooms - 1)
+      # random.choice(tuple(unexplored_adjacent_rooms_set)
+      
+      next_room_id = t[0]
+      t.remove(next_room_id)
+      
       # mark explored (remove from exploration table)
       unexplored_adjacent_rooms_set.remove(next_room_id)
+      # mark explored the way back
+      unexplored_adjacent_rooms_set_next_room = exploration_table[next_room_id]
+      unexplored_adjacent_rooms_set_next_room.remove(room_id)
       # mark room as unexplored if there remains any
       if len(unexplored_adjacent_rooms_set) != 0:
         rooms_with_unexpored_paths.append(room_id)
