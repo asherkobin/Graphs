@@ -1,6 +1,6 @@
 from ast import literal_eval
 from graph import Graph
-from helpers import build_graph, backtrack, build_exploration_table
+from helpers import build_graph, backtrack, build_exploration_table, convert_path_to_moves, build_ordinal_map
 import random
 
 def is_exploration_complete(exploration_table):
@@ -12,25 +12,18 @@ def is_exploration_complete(exploration_table):
 
 # DFS then BFS for backtrack
 
-def explore_graph(room_direction_graph):
-  mother_path = []
+def explore_graph(room_direction_table):
   start_room_id = 0
   room_id = start_room_id
-  room_graph = build_graph(room_direction_graph)
+  room_graph = build_graph(room_direction_table)
   exploration_table = build_exploration_table(room_graph.vertices)
   stack = []
   rooms_with_unexpored_paths = []
   
   stack.append([start_room_id])
 
-  # at the worse, keep going until there are every path has been explored
+  #TEMP
   t = [4, 8, 3, 1]
-
-  starting_room_paths = {}
-  starting_room_paths[4] = []
-  starting_room_paths[8] = []
-  starting_room_paths[3] = []
-  starting_room_paths[1] = []
 
   while not is_exploration_complete(exploration_table):
     path = stack.pop()
@@ -38,19 +31,6 @@ def explore_graph(room_direction_graph):
 
     unexplored_adjacent_rooms_set = exploration_table[room_id]
     num_unexplored_rooms = len(unexplored_adjacent_rooms_set)
-
-
-
-    a = 100
-    while a != 0:
-      a -= 1
-
-    if a != 0:
-      1/0
-
-
-
-
 
     if num_unexplored_rooms == 0: # aka DEAD-END
       if room_id in rooms_with_unexpored_paths:
@@ -60,12 +40,7 @@ def explore_graph(room_direction_graph):
       backtrack_path.reverse()
       path = backtrack_path[:-1] + path
 
-
-      if path[0] == start_room_id and path[-1] == start_room_id:
-        # path is complete
-        starting_room_paths[path[1]] = path
-      else:
-        stack.append(path)
+      stack.append(path)
       stack.append([previous_room_with_unexpored_paths])
 
     else:
@@ -92,11 +67,30 @@ def explore_graph(room_direction_graph):
 
       room_id = next_room_id
 
-  # TODO: stich togeother the stack
+  # stitch togeother the paths from the stack ("dequeue" the stack)
 
-  return mother_path
+  completed_path = [start_room_id]
+  
+  while len(stack) > 0:
+    next_segment = stack.pop(0)[:-1]
+    next_segment.reverse()
 
-map_file = "projects/adventure/maps/main_maze.txt"
-room_direction_graph = literal_eval(open(map_file, "r").read())
+    completed_path.extend(next_segment)
 
-explore_graph(room_direction_graph)
+
+  num_moves = len(completed_path)
+  if num_moves < 960:
+    raise Exception("Found Path for Stretch!")
+
+  t = completed_path[950:]
+
+  ordinal_map = build_ordinal_map(room_direction_table)
+
+  move_list = convert_path_to_moves(completed_path, ordinal_map)
+
+  return move_list
+
+#map_file = "projects/adventure/maps/main_maze.txt"
+#room_direction_graph = literal_eval(open(map_file, "r").read())
+
+#explore_graph(room_direction_graph)
