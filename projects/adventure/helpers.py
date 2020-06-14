@@ -14,11 +14,11 @@ def build_graph(room_graph):
 
   return g
 
-def build_ordinal_map(room_graph):
+def build_ordinal_map(room_direction_table):
   ordinal_map = {}
 
-  for room_id in room_graph:
-    moves = room_graph[room_id][1]
+  for room_id in room_direction_table:
+    moves = room_direction_table[room_id][1]
     for move in moves:
       connected_room_id = moves[move]
       ordinal_map[(room_id, connected_room_id)] = move
