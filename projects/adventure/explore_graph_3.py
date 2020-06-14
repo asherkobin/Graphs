@@ -12,8 +12,8 @@ def is_exploration_complete(exploration_table):
 
 # DFS then BFS for backtrack
 
-def explore_graph(room_direction_table):
-  start_room_id = 0
+def explore_graph(room_direction_table, starting_room = 0):
+  start_room_id = starting_room
   room_id = start_room_id
   room_graph = build_graph(room_direction_table)
   exploration_table = build_exploration_table(room_graph.vertices)
@@ -21,9 +21,6 @@ def explore_graph(room_direction_table):
   rooms_with_unexpored_paths = []
   
   stack.append([start_room_id])
-
-  #TEMP
-  t = [4, 8, 3, 1]
 
   while not is_exploration_complete(exploration_table):
     path = stack.pop()
@@ -45,22 +42,19 @@ def explore_graph(room_direction_table):
 
     else:
       # pick a random unexplored adjacent room to visit
-      # next_room_id = random.choice(tuple(unexplored_adjacent_rooms_set))
-      
-      if room_id == 0:
-        next_room_id = t[0]
-        t.remove(next_room_id)
-      else:
-        next_room_id = random.choice(tuple(unexplored_adjacent_rooms_set))
+      next_room_id = random.choice(tuple(unexplored_adjacent_rooms_set))
       
       # mark explored (remove from exploration table)
       unexplored_adjacent_rooms_set.remove(next_room_id)
+      
       # mark explored the way back
       unexplored_adjacent_rooms_set_next_room = exploration_table[next_room_id]
       unexplored_adjacent_rooms_set_next_room.remove(room_id)
+      
       # mark room as unexplored if there remains any
       if len(unexplored_adjacent_rooms_set) != 0:
         rooms_with_unexpored_paths.append(room_id)
+      
       # save path
       path_copy = [next_room_id, *path]
       stack.append(path_copy)
@@ -77,20 +71,12 @@ def explore_graph(room_direction_table):
 
     completed_path.extend(next_segment)
 
-
   num_moves = len(completed_path)
   if num_moves < 960:
     raise Exception("Found Path for Stretch!")
-
-  t = completed_path[950:]
 
   ordinal_map = build_ordinal_map(room_direction_table)
 
   move_list = convert_path_to_moves(completed_path, ordinal_map)
 
   return move_list
-
-#map_file = "projects/adventure/maps/main_maze.txt"
-#room_direction_graph = literal_eval(open(map_file, "r").read())
-
-#explore_graph(room_direction_graph)
