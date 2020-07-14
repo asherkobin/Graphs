@@ -1,0 +1,25 @@
+def bfs(self, starting_vert, destination_vert):
+        q = Queue()
+        q.enqueue(starting_vert)
+        visited = set()
+        while q.size() > 0:
+            path = [q.dequeue()]
+            v = path[-1]
+            if v not in visited:
+                visited.add(v)
+                if v == destination_vert:
+                    return path
+                else:
+                    for vert in self.get_neighbors(v):
+                        new_path = list(path)
+                        new_path.append(vert)
+                        q.enqueue(new_path)
+
+
+
+
+think you're really close! I think this line: path = [q.dequeue()] is
+probably creating some lists within lists that you don't want; if you
+enqueue the starting vert as a single-element path, as in
+q.enqueue([starting_vert]), then your queue elements should all be lists and you can
+just grab the path with path = q.dequeue(). Let me know if that makes sense! (edited) 

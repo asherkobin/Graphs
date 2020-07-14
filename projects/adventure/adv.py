@@ -2,33 +2,30 @@ from room import Room
 from player import Player
 from world import World
 
+from explore_graph_3 import explore_graph
+
 import random
 from ast import literal_eval
 
 # Load world
 world = World()
 
-
-# You may uncomment the smaller graphs for development and testing purposes.
-# map_file = "maps/test_line.txt"
-# map_file = "maps/test_cross.txt"
-# map_file = "maps/test_loop.txt"
-# map_file = "maps/test_loop_fork.txt"
-map_file = "maps/main_maze.txt"
+map_file = "projects/adventure/maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
 world.load_graph(room_graph)
+
+print(room_graph)
 
 # Print an ASCII map
 world.print_rooms()
 
 player = Player(world.starting_room)
 
-# Fill this out with directions to walk
-# traversal_path = ['n', 'n']
-traversal_path = []
-
+####### ME ME ME ME ########
+traversal_path = explore_graph(room_graph)
+####### ME ME ME ME ########
 
 
 # TRAVERSAL TEST
